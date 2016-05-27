@@ -1,0 +1,21 @@
+{
+  "name": "graphdux",
+  "version": "0.1.0",
+  "description": "A graphql/redux integration toolkit",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "author": "Mobelux, LLC",
+  "repository": "http://github.com/Mobelux/graphdux",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "lokka": ">= 1.7.0",
+    "lokka-transport-http": ">= 1.4.0"
+  },
+  "optionalDependencies": {
+    "normalizr": ">= 2.0.0",
+    "react": ">= 15.0.0",
+    "react-router": ">= 2.0.0"
+  }
+}
