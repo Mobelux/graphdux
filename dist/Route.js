@@ -62,6 +62,7 @@ Route.createRouteFromReactElement = function (element, _parentRoute) {
     var store = _element$props.store;
     var _element$props$variab = _element$props.variables;
     var routeVariables = _element$props$variab === undefined ? {} : _element$props$variab;
+    var queryName = _element$props.queryName;
 
 
     var route = (0, _RouteUtils.createRouteFromReactElement)(element);
@@ -85,14 +86,21 @@ Route.createRouteFromReactElement = function (element, _parentRoute) {
         var compVars = component.variables && component.variables(store.getState()) || {};
         var variables = _extends({}, compVars, routeVariables);
 
-        // check if component is a container
-        // WrappedComponent seems to be pretty popular
-        var name = component.WrappedComponent && component.WrappedComponent.displayName ? component.WrappedComponent.displayName
-        // try display name or function name
-        : component.displayName || component.name;
+        // if the query name is specified in props, use that, otherwise get the name from the
+        // component
+        var qName = void 0;
+        if (queryName) {
+            qName = queryName;
+        } else {
+            // check if component is a container
+            // WrappedComponent seems to be pretty popular
+            qName = component.WrappedComponent && component.WrappedComponent.displayName ? component.WrappedComponent.displayName
+            // try display name or function name
+            : component.displayName || component.name;
+        }
 
         if (typeof fetch === 'function') {
-            var maybePromise = fetch(name, graphqlQuery, variables, schema);
+            var maybePromise = fetch(qName, graphqlQuery, variables, schema);
 
             if (typeof maybePromise.then === 'function') {
                 maybePromise.then(function () {
