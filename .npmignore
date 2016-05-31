@@ -7,4 +7,5 @@
 npm-debug.log
 lib
 .babelrc
-
+.editorconfig
+.eslintrc
