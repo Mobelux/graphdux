@@ -14,9 +14,10 @@ var _lokkaTransportHttp = require('lokka-transport-http');
 
 var _constants = require('./constants');
 
-// have to use `require` instead of `import` to satisfy eslint
-// import { normalize } from 'normalizr';
+// have to use `require` instead of `import` because normalizr may not exist at runtime
+/* eslint-disable import/no-unresolved */
 var normalizrLib = require('normalizr');
+/* eslint-enable */
 var normalize = null;
 if (normalizrLib) {
     normalize = normalizrLib.normalize;

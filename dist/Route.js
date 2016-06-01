@@ -8,19 +8,24 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _RouteUtils = require('react-router/lib/RouteUtils');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// have to disable this guy because it will be resolved at runtime
+/* eslint-disable import/no-unresolved */
+var React = require('react');
+var reactRouterUtils = require('react-router/lib/RouteUtils');
+/* eslint-enable */
+if (!React) {
+    throw new Error('[Graphdux][Route] Graphdux Route component requires react');
+}
+if (!reactRouterUtils) {
+    throw new Error('[Graphdux][Route] Graphdux Route component requires react-router');
+}
+var createRouteFromReactElement = reactRouterUtils.createRouteFromReactElement;
 
 var Route = function (_React$Component) {
     _inherits(Route, _React$Component);
@@ -39,15 +44,15 @@ var Route = function (_React$Component) {
     }]);
 
     return Route;
-}(_react2.default.Component);
+}(React.Component);
 
 Route.propTypes = {
-    path: _react2.default.PropTypes.string,
-    component: _react2.default.PropTypes.func,
-    fetch: _react2.default.PropTypes.func.isRequired,
-    store: _react2.default.PropTypes.object.isRequired,
-    variables: _react2.default.PropTypes.object,
-    schema: _react2.default.PropTypes.object
+    path: React.PropTypes.string,
+    component: React.PropTypes.func,
+    fetch: React.PropTypes.func.isRequired,
+    store: React.PropTypes.object.isRequired,
+    variables: React.PropTypes.object,
+    schema: React.PropTypes.object
 };
 Route.getDefaultProps = {
     isGraphRoute: true
@@ -65,7 +70,7 @@ Route.createRouteFromReactElement = function (element, _parentRoute) {
     var queryName = _element$props.queryName;
 
 
-    var route = (0, _RouteUtils.createRouteFromReactElement)(element);
+    var route = createRouteFromReactElement(element);
 
     // check if component has a query to fire off
     var graphqlQuery = query || component.query;
@@ -83,6 +88,7 @@ Route.createRouteFromReactElement = function (element, _parentRoute) {
         //     parentRoute.onEnter(nextState, replace);
         // }
 
+        // the component can have a `variables` fn to build args to the query
         var compVars = component.variables && component.variables(store.getState()) || {};
         var variables = _extends({}, compVars, routeVariables);
 
