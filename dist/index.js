@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Route = exports.middleware = exports.graphQLQuery = exports.GRAPHQL_MUTATION = exports.GRAPHQL_QUERY = undefined;
+exports.Route = exports.middleware = exports.graphQLMutation = exports.graphQLQuery = exports.GRAPHQL_MUTATION = exports.GRAPHQL_QUERY = undefined;
 
 var _constants = require('./constants');
 
@@ -26,6 +26,12 @@ Object.defineProperty(exports, 'graphQLQuery', {
   enumerable: true,
   get: function get() {
     return _actions.graphQLQuery;
+  }
+});
+Object.defineProperty(exports, 'graphQLMutation', {
+  enumerable: true,
+  get: function get() {
+    return _actions.graphQLMutation;
   }
 });
 

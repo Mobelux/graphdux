@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.graphQLQuery = graphQLQuery;
+exports.graphQLMutation = graphQLMutation;
 
 var _constants = require('./constants');
 
@@ -26,4 +27,18 @@ function graphQLQuery(name, query) {
     }
 
     return _defineProperty({}, _constants.GRAPHQL_QUERY, action);
+}
+
+function graphQLMutation(name, mutation) {
+    var variables = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+    var action = {
+        type: name.toUpperCase(),
+        payload: {
+            query: mutation,
+            variables: variables
+        }
+    };
+
+    return _defineProperty({}, _constants.GRAPHQL_MUTATION, action);
 }
