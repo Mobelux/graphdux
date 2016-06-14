@@ -3,6 +3,7 @@
 import expect from 'expect';
 
 import { graphQLQuery, graphQLMutation, GRAPHQL_QUERY, GRAPHQL_MUTATION } from '../lib';
+
 describe('graphdux action creator', () => {
     it('should handle a graphql query action with all the trimmings', () => {
         const qName = 'TEST_QUERY';
@@ -52,6 +53,17 @@ describe('graphdux action creator', () => {
         expect(action.meta).toNotExist();
     });
 
+    it('should includes `types` key if non-string type is specified', () => {
+        const qTypes = ['QREQ', 'QSUC', 'QFAI'];
+        const query = 'graphql query';
+        const qAction = graphQLQuery(qTypes, query);
+        const action = qAction[GRAPHQL_QUERY];
+        expect(action).toBeA(Object);
+        expect(action.types).toExist();
+        expect(action.type).toNotExist();
+        expect(action.types).toEqual(qTypes);
+    });
+
     it('should handle a graphql mutation action with all the trimmings', () => {
         const name = 'TEST_MUTATION';
         const mutation = 'graphql mutation';
@@ -85,5 +97,16 @@ describe('graphdux action creator', () => {
         const mAction = graphQLMutation(name, mutation, variables);
         const action = mAction[GRAPHQL_MUTATION];
         expect(action.type).toEqual('TEST_MUTATION');
+    });
+
+    it('should include a `types` key when an array is specified as the mutation type', () => {
+        const mTypes = ['MREQ', 'MSUC', 'MFAI'];
+        const mutation = 'graphql mutation';
+        const mAction = graphQLMutation(mTypes, mutation);
+        const action = mAction[GRAPHQL_MUTATION];
+        expect(action).toBeA(Object);
+        expect(action.type).toNotExist();
+        expect(action.types).toExist();
+        expect(action.types).toEqual(mTypes);
     });
 });

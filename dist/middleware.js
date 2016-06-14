@@ -12,6 +12,8 @@ var _lokka = require('lokka');
 
 var _lokkaTransportHttp = require('lokka-transport-http');
 
+var _humps = require('humps');
+
 var _constants = require('./constants');
 
 // have to use `require` instead of `import` because normalizr may not exist at runtime
@@ -23,13 +25,16 @@ if (normalizrLib) {
     normalize = normalizrLib.normalize;
 }
 
+var graphduxDefaultActionType = 'GRAPHDUX_QUERY';
 function createRequestTypes(base) {
     return ['REQUEST', 'SUCCESS', 'FAILURE'].map(function (type) {
         return base + '_' + type;
     });
 }
 
-function Middleware(endpoint, options) {
+function Middleware(endpoint) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
     var client = new _lokka.Lokka({
         transport: new _lokkaTransportHttp.Transport(endpoint, options)
     });
@@ -54,16 +59,17 @@ function Middleware(endpoint, options) {
                 _GRAPHQL$meta = _GRAPHQL$meta === undefined ? {} : _GRAPHQL$meta;
                 var schema = _GRAPHQL$meta.schema;
 
+                // default the graphql request type
 
-                if (typeof type === 'undefined') {
-                    throw new Error('[graphql-redux] field "type" is required on GraphQL actions');
-                }
+                var queryType = type || graphduxDefaultActionType;
 
                 if (typeof query !== 'string') {
                     throw new Error('[graphql-redux] field "query" is required to be a string on GraphQL actions');
                 }
 
-                var _ref = types || createRequestTypes(type);
+                // build action types if not specified
+
+                var _ref = types || createRequestTypes(queryType);
 
                 var _ref2 = _slicedToArray(_ref, 3);
 
@@ -71,31 +77,35 @@ function Middleware(endpoint, options) {
                 var successType = _ref2[1];
                 var failureType = _ref2[2];
 
-                // fire off graphql request action
+                // decamelize vars if desired
 
+                var queryVars = options.enforceCamelcase ? (0, _humps.decamelizeKeys)(variables) : variables;
+
+                // fire off graphql request action
                 next({
                     type: requestType,
                     payload: {
                         query: query,
-                        variables: variables
+                        queryVars: queryVars
                     }
                 });
 
                 // call graphql endpoint
-                return client.query(query, variables).then(
+                return client.query(query, queryVars).then(
                 // success -> call graphql_success action
-                function (response) {
+                function (data) {
+                    var queryResp = options.enforceCamelcase ? (0, _humps.camelizeKeys)(data) : data;
                     return next({
                         type: successType,
-                        payload: schema && normalize ? normalize(response, schema) : response
+                        payload: schema && normalize ? normalize(queryResp, schema) : queryResp
                     });
                 },
                 // failure -> call graphql_failure action
-                function (response) {
+                function (error) {
                     return next({
                         type: failureType,
                         error: true,
-                        payload: response.errors
+                        payload: options.enforceCamelcase ? (0, _humps.camelizeKeys)(error.rawError) : error.rawError
                     });
                 });
             };
