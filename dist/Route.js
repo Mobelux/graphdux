@@ -95,7 +95,7 @@ Route.createRouteFromReactElement = function (element, _parentRoute) {
         // if the query name is specified in props, use that, otherwise get the name from the
         // component
         var qName = void 0;
-        if (queryName) {
+        if (typeof queryName !== 'undefined') {
             qName = queryName;
         } else {
             // check if component is a container

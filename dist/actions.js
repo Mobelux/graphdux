@@ -23,7 +23,7 @@ function graphQLQuery(type, query) {
     if (type instanceof Array) {
         action.types = type;
     } else {
-        action.type = type.toUpperCase();
+        action.type = type && type.toUpperCase();
     }
 
     if (schema) {
@@ -45,7 +45,7 @@ function graphQLMutation(type, mutation) {
     if (type instanceof Array) {
         action.types = type;
     } else {
-        action.type = type.toUpperCase();
+        action.type = type && type.toUpperCase();
     }
 
     return _defineProperty({}, _constants.GRAPHQL_MUTATION, action);
