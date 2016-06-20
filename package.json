@@ -14,7 +14,7 @@
   "repository": "http://github.com/Mobelux/graphdux",
   "license": "UNLICENSED",
   "dependencies": {
-    "humps": "^1.1.0",
+    "humps": ">=1.1.0",
     "lokka": ">= 1.7.0",
     "lokka-transport-http": ">= 1.4.0"
   },
