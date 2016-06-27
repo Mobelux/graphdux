@@ -89,7 +89,7 @@ Route.createRouteFromReactElement = function (element, _parentRoute) {
         // }
 
         // the component can have a `variables` fn to build args to the query
-        var compVars = component.variables && component.variables(store.getState()) || {};
+        var compVars = component && component.variables && component.variables(store.getState()) || {};
         var variables = _extends({}, compVars, routeVariables);
 
         // if the query name is specified in props, use that, otherwise get the name from the

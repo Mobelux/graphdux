@@ -42,9 +42,11 @@ function Middleware(endpoint) {
     return function (_store) {
         return function (next) {
             return function (action) {
-                var GRAPHQL = action[_constants.GRAPHQL_QUERY] || action[_constants.GRAPHQL_MUTATION];
+                var graphduxType = Object.keys(action)[0];
+                var GRAPHQL = action[graphduxType];
 
-                if (typeof GRAPHQL === 'undefined') {
+                // nothing to see here if it's not a graphdux action or no action data
+                if ([_constants.GRAPHQL_QUERY, _constants.GRAPHQL_MUTATION, _constants.GRAPHQL_CACHED_QUERY].indexOf(graphduxType) === -1 || typeof GRAPHQL === 'undefined') {
                     return next(action);
                 }
 
@@ -90,24 +92,52 @@ function Middleware(endpoint) {
                     }
                 });
 
-                // call graphql endpoint
-                return client.query(query, queryVars).then(
-                // success -> call graphql_success action
-                function (data) {
-                    var queryResp = options.enforceCamelcase ? (0, _humps.camelizeKeys)(data) : data;
-                    return next({
-                        type: successType,
-                        payload: schema && normalize ? normalize(queryResp, schema) : queryResp
-                    });
-                },
-                // failure -> call graphql_failure action
-                function (error) {
-                    return next({
-                        type: failureType,
-                        error: true,
-                        payload: options.enforceCamelcase ? (0, _humps.camelizeKeys)(error.rawError) : error.rawError
-                    });
-                });
+                var actionPromise = void 0;
+
+                // the majority of our traffic is typically queries and mutations
+                if (graphduxType === _constants.GRAPHQL_QUERY || graphduxType === _constants.GRAPHQL_MUTATION) {
+                    // call graphql endpoint
+                    actionPromise = client.query(query, queryVars).then(
+                    // success -> call graphql_success action
+                    function (data) {
+                        var queryResp = options.enforceCamelcase ? (0, _humps.camelizeKeys)(data) : data;
+                        return next({
+                            type: successType,
+                            payload: schema && normalize ? normalize(queryResp, schema) : queryResp
+                        });
+                    },
+                    // failure -> call graphql_failure action
+                    function (error) {
+                        return next({
+                            type: failureType,
+                            error: true,
+                            payload: options.enforceCamelcase ? (0, _humps.camelizeKeys)(error.rawError) : error.rawError
+                        });
+                    }); //
+                } else if (graphduxType === _constants.GRAPHQL_CACHED_QUERY) {
+                        // cached queries behave a bit differently
+                        var cachedResult = client.cache.getItemPayload(query, queryVars);
+                        if (cachedResult) {
+                            actionPromise = next({
+                                type: successType,
+                                payload: schema && normalize ? normalize(cachedResult, schema) : cachedResult
+                            });
+                        } else {
+                            // need to return a promise from the middleware for action chaining
+                            actionPromise = new Promise(function (resolve) {
+                                client.watchQuery(query, queryVars, function () {
+                                    resolve();
+                                });
+                            }).then(function () {
+                                var fresRes = client.cache.getItemPayload(query, queryVars);
+                                return next({
+                                    type: successType,
+                                    payload: schema && normalize ? normalize(fresRes, schema) : fresRes
+                                });
+                            });
+                        }
+                    }
+                return actionPromise;
             };
         };
     };
