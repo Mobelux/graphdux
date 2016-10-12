@@ -16,9 +16,15 @@ var _humps = require('humps');
 
 var _constants = require('./constants');
 
-// have to use `require` instead of `import` because normalizr may not exist at runtime
+// check for optional dependency on normalizr
 /* eslint-disable import/no-extraneous-dependencies */
-var normalizrLib = require('normalizr');
+var normalizrLib = void 0;
+try {
+    /* eslint-disable global-require */
+    normalizrLib = require('normalizr');
+} catch (er) {
+    normalizrLib = null;
+}
 /* eslint-enable */
 var normalize = null;
 if (normalizrLib) {
