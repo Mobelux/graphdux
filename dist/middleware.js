@@ -17,7 +17,7 @@ var _humps = require('humps');
 var _constants = require('./constants');
 
 // have to use `require` instead of `import` because normalizr may not exist at runtime
-/* eslint-disable import/no-unresolved */
+/* eslint-disable import/no-extraneous-dependencies */
 var normalizrLib = require('normalizr');
 /* eslint-enable */
 var normalize = null;
@@ -33,7 +33,7 @@ function createRequestTypes(base) {
 }
 
 function Middleware(endpoint) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var client = new _lokka.Lokka({
         transport: new _lokkaTransportHttp.Transport(endpoint, options)
@@ -115,28 +115,28 @@ function Middleware(endpoint) {
                         });
                     }); //
                 } else if (graphduxType === _constants.GRAPHQL_CACHED_QUERY) {
-                        // cached queries behave a bit differently
-                        var cachedResult = client.cache.getItemPayload(query, queryVars);
-                        if (cachedResult) {
-                            actionPromise = next({
+                    // cached queries behave a bit differently
+                    var cachedResult = client.cache.getItemPayload(query, queryVars);
+                    if (cachedResult) {
+                        actionPromise = next({
+                            type: successType,
+                            payload: schema && normalize ? normalize(cachedResult, schema) : cachedResult
+                        });
+                    } else {
+                        // need to return a promise from the middleware for action chaining
+                        actionPromise = new Promise(function (resolve) {
+                            client.watchQuery(query, queryVars, function () {
+                                resolve();
+                            });
+                        }).then(function () {
+                            var fresRes = client.cache.getItemPayload(query, queryVars);
+                            return next({
                                 type: successType,
-                                payload: schema && normalize ? normalize(cachedResult, schema) : cachedResult
+                                payload: schema && normalize ? normalize(fresRes, schema) : fresRes
                             });
-                        } else {
-                            // need to return a promise from the middleware for action chaining
-                            actionPromise = new Promise(function (resolve) {
-                                client.watchQuery(query, queryVars, function () {
-                                    resolve();
-                                });
-                            }).then(function () {
-                                var fresRes = client.cache.getItemPayload(query, queryVars);
-                                return next({
-                                    type: successType,
-                                    payload: schema && normalize ? normalize(fresRes, schema) : fresRes
-                                });
-                            });
-                        }
+                        });
                     }
+                }
                 return actionPromise;
             };
         };

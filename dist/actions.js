@@ -32,21 +32,21 @@ var actionData = function actionData(type, query, variables, schema) {
 };
 
 function graphQLQuery(type, query) {
-    var variables = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-    var schema = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+    var variables = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var schema = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
     return _defineProperty({}, _constants.GRAPHQL_QUERY, actionData(type, query, variables, schema));
 }
 
 function graphQLMutation(type, mutation) {
-    var variables = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var variables = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     return _defineProperty({}, _constants.GRAPHQL_MUTATION, actionData(type, mutation, variables));
 }
 
 function graphQLCachedQuery(type, query) {
-    var variables = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-    var schema = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+    var variables = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var schema = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
     return _defineProperty({}, _constants.GRAPHQL_CACHED_QUERY, actionData(type, query, variables, schema));
 }

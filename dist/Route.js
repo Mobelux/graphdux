@@ -15,7 +15,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // have to disable this guy because it will be resolved at runtime
-/* eslint-disable import/no-unresolved */
+/* eslint-disable import/no-extraneous-dependencies */
 var React = require('react');
 var reactRouterUtils = require('react-router/lib/RouteUtils');
 /* eslint-enable */
@@ -27,13 +27,15 @@ if (!reactRouterUtils) {
 }
 var createRouteFromReactElement = reactRouterUtils.createRouteFromReactElement;
 
+/* eslint-disable react/forbid-prop-types */
+
 var Route = function (_React$Component) {
     _inherits(Route, _React$Component);
 
     function Route() {
         _classCallCheck(this, Route);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(Route).apply(this, arguments));
+        return _possibleConstructorReturn(this, (Route.__proto__ || Object.getPrototypeOf(Route)).apply(this, arguments));
     }
 
     _createClass(Route, [{
