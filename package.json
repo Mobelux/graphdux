@@ -1,6 +1,6 @@
 {
   "name": "graphdux",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A graphql/redux integration toolkit",
   "main": "./dist/index.js",
   "scripts": {
